@@ -1,0 +1,6 @@
+apiVersion: v2
+name: upstatus
+description: A Kubernetes monitoring and error analysis solution
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

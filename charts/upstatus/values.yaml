@@ -1,0 +1,189 @@
+# Manager component configuration
+manager:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: zvcxz/upstatus-manager
+    pullPolicy: IfNotPresent
+    tag: "0.0.3"
+
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+
+  securityContext: {}
+
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8080
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  # LLM configuration for error analysis
+  llm:
+    # Provider to use: "openai", "claude", or "llama"
+    provider: "openai"
+    
+    # API key - should be set via secret
+    apiKey: ""
+    # existingSecret: llm-api-key
+    # existingSecretKey: api-key
+    
+    # Rate limiting configuration
+    rateLimit:
+      # Cooldown period in minutes between API calls for the same pod
+      cooldownMinutes: 10
+    
+    # OpenAI specific configuration
+    openai:
+      # Default model to use
+      defaultModel: "gpt-3.5-turbo"
+      # Base URL for OpenAI API
+      baseURL: "https://api.openai.com/v1/chat/completions"
+      # Organization ID (optional)
+      organization: ""
+    
+    # Claude specific configuration
+    claude:
+      # Default model to use
+      defaultModel: "claude-3-haiku-20240307"
+      # Base URL for Claude API
+      baseURL: "https://api.anthropic.com/v1/messages"
+    
+    # Llama specific configuration
+    llama:
+      # Default model to use
+      defaultModel: "llama-3-70b-instruct"
+      # Base URL for Llama API
+      baseURL: "https://api.meta.ai/v1/chat/completions"
+
+  # Kubernetes namespace to watch
+  namespace: upstatus-system
+
+  # RBAC configuration
+  rbac:
+    # Specifies whether RBAC resources should be created
+    create: true
+    # Annotations to add to the RBAC resources
+    annotations: {}
+
+# Agent component configuration
+agent:
+  enabled: true
+  
+  image:
+    repository: zvcxz/upstatus-node-agent
+    pullPolicy: IfNotPresent
+    tag: "0.0.3"
+
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podAnnotations: {}
+  podLabels: {}
+
+  securityContext:
+    # The agent needs privileged access to read container logs
+    privileged: true
+    # Allow file system writes for state tracking
+    readOnlyRootFilesystem: false
+
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  # Agent-specific configuration
+  agent:
+    # Log verbosity level (0-5, higher means more verbose logging)
+    verbosity: 4
+    
+    # Log rotation window in seconds
+    logRotationWindow: 30
+    
+    # Maximum memory usage in MB
+    maxMemoryUsageMB: 100
+    
+    # Buffer size in bytes for each container
+    bufferSizeBytes: 1048576
+    
+    # Namespace filtering configuration
+    namespaces:
+      # Mode can be 'include' or 'exclude'
+      # - 'include': Only collect logs from the specified namespaces
+      # - 'exclude': Collect logs from all namespaces except the specified ones
+      mode: "exclude"
+      # List of namespaces to include or exclude based on the mode
+      list: "kube-public,kube-node-lease"
+      # Whether to automatically blacklist system namespaces (kube-system, etc.)
+      # Set to false to collect logs from system namespaces
+      blacklistSystem: false
+    
+    # Label filtering configuration
+    labels:
+      # Labels to include - pods must have ALL these labels to be included
+      # Format: key1=value1,key2=value2
+      include: ""
+      # Labels to exclude - pods with ANY of these labels will be excluded
+      # Format: key1=value1,key2=value2
+      exclude: "upstatus.at/skip-monitoring=true,app.kubernetes.io/name=upstatus-agent,app.kubernetes.io/instance=manager"
+    
+    # Metrics configuration
+    metricsEnabled: true
+    metricsPort: 9090
+    
+    # Health check configuration
+    healthCheckPort: 8080
+
+  # RBAC configuration
+  rbac:
+    # Specifies whether RBAC resources should be created
+    create: true
+    # Annotations to add to the RBAC resources
+    annotations: {}

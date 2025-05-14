@@ -1,0 +1,35 @@
+{{- if and .Values.agent.enabled .Values.agent.rbac.create -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "upstatus.agent.fullname" . }}
+  labels:
+    {{- include "upstatus.agent.labels" . | nindent 4 }}
+  {{- with .Values.agent.rbac.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "nodes"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "upstatus.agent.fullname" . }}
+  labels:
+    {{- include "upstatus.agent.labels" . | nindent 4 }}
+  {{- with .Values.agent.rbac.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "upstatus.agent.fullname" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "upstatus.agent.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace }}
+{{- end }}

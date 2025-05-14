@@ -1,0 +1,21 @@
+{{- if .Values.agent.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "upstatus.agent.fullname" . }}
+  labels:
+    {{- include "upstatus.agent.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.agent.agent.metricsPort }}
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+    - port: {{ .Values.agent.agent.healthCheckPort }}
+      targetPort: health
+      protocol: TCP
+      name: health
+  selector:
+    {{- include "upstatus.agent.selectorLabels" . | nindent 4 }}
+{{- end }}

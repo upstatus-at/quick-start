@@ -1,0 +1,111 @@
+{{- if .Values.manager.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "upstatus.manager.fullname" . }}
+  labels:
+    {{- include "upstatus.manager.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.manager.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "upstatus.manager.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.manager.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "upstatus.manager.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.manager.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "upstatus.manager.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.manager.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}-manager
+          securityContext:
+            {{- toYaml .Values.manager.securityContext | nindent 12 }}
+          image: "{{ .Values.manager.image.repository }}:{{ .Values.manager.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.manager.image.pullPolicy }}
+          command: ["./manager"]
+          args:
+            - "-namespace={{ .Values.manager.namespace }}"
+            - "-port={{ .Values.manager.service.targetPort }}"
+          env:
+            # LLM Provider configuration
+            - name: LLM_PROVIDER
+              value: "{{ .Values.manager.llm.provider }}"
+              
+            # Unified LLM API key
+            - name: LLM_API_KEY
+              {{- if .Values.manager.llm.existingSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.manager.llm.existingSecret }}
+                  key: {{ .Values.manager.llm.existingSecretKey }}
+              {{- else }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "upstatus.manager.fullname" . }}-llm
+                  key: api-key
+              {{- end }}
+              
+            # Rate limiting configuration
+            - name: RATE_LIMIT_COOLDOWN_MINUTES
+              value: "{{ .Values.manager.llm.rateLimit.cooldownMinutes }}"
+              
+            # OpenAI specific configuration
+            - name: OPENAI_MODEL
+              value: "{{ .Values.manager.llm.openai.defaultModel }}"
+            - name: OPENAI_BASE_URL
+              value: "{{ .Values.manager.llm.openai.baseURL }}"
+            - name: OPENAI_ORGANIZATION
+              value: "{{ .Values.manager.llm.openai.organization }}"
+              
+            # Claude specific configuration
+            - name: CLAUDE_MODEL
+              value: "{{ .Values.manager.llm.claude.defaultModel }}"
+            - name: CLAUDE_BASE_URL
+              value: "{{ .Values.manager.llm.claude.baseURL }}"
+              
+            # Llama specific configuration
+            - name: LLAMA_MODEL
+              value: "{{ .Values.manager.llm.llama.defaultModel }}"
+            - name: LLAMA_BASE_URL
+              value: "{{ .Values.manager.llm.llama.baseURL }}"
+          ports:
+            - name: http
+              containerPort: {{ .Values.manager.service.targetPort }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.manager.resources | nindent 12 }}
+      {{- with .Values.manager.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.manager.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.manager.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
