@@ -6,7 +6,7 @@ manager:
   image:
     repository: zvcxz/upstatus-manager
     pullPolicy: IfNotPresent
-    tag: "0.0.3"
+    tag: "0.0.4"
 
   imagePullSecrets: []
   nameOverride: ""
@@ -101,7 +101,7 @@ agent:
   image:
     repository: zvcxz/upstatus-node-agent
     pullPolicy: IfNotPresent
-    tag: "0.0.3"
+    tag: "0.0.4"
 
   imagePullSecrets: []
   nameOverride: ""
@@ -160,7 +160,7 @@ agent:
       # - 'exclude': Collect logs from all namespaces except the specified ones
       mode: "exclude"
       # List of namespaces to include or exclude based on the mode
-      list: "kube-public,kube-node-lease"
+      list: "kube-public,kube-node-lease,kube-system"
       # Whether to automatically blacklist system namespaces (kube-system, etc.)
       # Set to false to collect logs from system namespaces
       blacklistSystem: false
