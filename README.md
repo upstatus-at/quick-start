@@ -98,6 +98,22 @@ helm install upstatus ./charts/upstatus \
 
 Replace `openai` with `claude` or `llama` depending on which provider you want to use.
 
+## Accessing the Dashboard
+
+After installing Upstatus, you can access the web dashboard by port-forwarding the manager service to your local machine:
+
+```bash
+kubectl port-forward -n upstatus-system svc/upstatus-manager 8080:80
+```
+
+Once the port forwarding is active, you can access the dashboard by opening your browser and navigating to:
+
+```
+http://localhost:8080
+```
+
+The dashboard provides a visual interface for monitoring your Kubernetes resources and analyzing errors detected by Upstatus.
+
 ## Uninstalling the Chart
 
 To uninstall/delete the `upstatus` deployment:
@@ -129,3 +145,12 @@ To view logs from an agent:
 ```bash
 kubectl logs -l app.kubernetes.io/name=upstatus-agent -n upstatus-system
 ```
+
+## Roadmap
+
+The Upstatus project is actively being developed with the following features planned for future releases:
+
+- **Alerts Integration**: Connect with popular alerting systems like Prometheus Alertmanager, PagerDuty, and Slack
+- **Self-Solving Issues**: Automated remediation of common problems without human intervention
+- **Integration with User-Written Runbooks**: Support for custom runbooks specific to different types of workloads
+
