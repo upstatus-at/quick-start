@@ -9,11 +9,9 @@ This branch hosts the Helm repository for Upstatus, a Kubernetes monitoring and 
 To add this Helm repository to your Helm client:
 
 ```bash
-helm repo add upstatus https://YOUR-GITHUB-USERNAME.github.io/upstatus.at/repo
+helm repo add upstatus https://upstatus-at.github.io/upstatus.at/repo
 helm repo update
 ```
-
-Replace `YOUR-GITHUB-USERNAME` with your actual GitHub username.
 
 ### Available Charts
 
