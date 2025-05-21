@@ -9,7 +9,7 @@ This branch hosts the Helm repository for Upstatus, a Kubernetes monitoring and 
 To add this Helm repository to your Helm client:
 
 ```bash
-helm repo add upstatus https://upstatus-at.github.io/upstatus.at/repo
+helm repo add upstatus https://upstatus-at.github.io/quick-start/repo
 helm repo update
 ```
 
@@ -51,7 +51,7 @@ To update this Helm repository with a new chart version:
 3. Package the updated chart: `helm package charts/upstatus -d /tmp`
 4. Switch to the gh-pages branch
 5. Move the packaged chart to the repo directory: `mv /tmp/upstatus-x.y.z.tgz repo/`
-6. Update the repository index: `helm repo index repo`
+6. Update the repository index: `helm repo index repo --url https://upstatus-at.github.io/quick-start/repo`
 7. Commit and push the changes to the gh-pages branch
 
 ## Documentation

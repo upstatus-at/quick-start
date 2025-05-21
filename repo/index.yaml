@@ -3,12 +3,12 @@ entries:
   upstatus:
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2025-05-21T13:22:24.600184+02:00"
+    created: "2025-05-21T13:35:12.049702+02:00"
     description: A Kubernetes monitoring and error analysis solution
     digest: deacbc8d93d2752439d61c93f6dc5ef035d909ef4be3ee937145cf5eadfe8164
     name: upstatus
     type: application
     urls:
-    - upstatus-0.1.0.tgz
+    - https://upstatus-at.github.io/quick-start/repo/upstatus-0.1.0.tgz
     version: 0.1.0
-generated: "2025-05-21T13:22:24.599638+02:00"
+generated: "2025-05-21T13:35:12.049181+02:00"
